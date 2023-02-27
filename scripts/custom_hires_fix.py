@@ -66,7 +66,7 @@ class CustomHiresFix(scripts.Script):
                 second_noise_scheduler = gr.Dropdown(['High denoising', 'Low denoising'], label='Noise scheduler (2)', value='Low denoising')
             with gr.Row():
                 dpmu_factor = gr.Slider(minimum=0.6, maximum=1.0, step=0.01, label="DPMU output factor (color correction)", value=0.85)
-                disable = gr.Checkbox(label='Disable extension', value=False)
+                disable = gr.Checkbox(label='Disable extension', value=True)
 
         return [first_upscaler, second_upscaler, first_cfg, second_cfg, first_denoise, second_denoise,
                 first_sampler, second_sampler, first_noise_scheduler, second_noise_scheduler, dpmu_factor, disable]
