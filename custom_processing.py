@@ -17,12 +17,13 @@ dpmu_factor: float = 0.85
 
 
 @torch.no_grad()
-def sampler_dpmu(model, x, sigmas, extra_args=None, callback=None, disable=None):
+def sampler_dpmu(model, x, initial_sigmas, extra_args=None, callback=None, disable=None):
     extra_args = {} if extra_args is None else extra_args
     s_in = x.new_ones([x.shape[0]])
     sigma_fn = lambda t: t.neg().exp()
     t_fn = lambda sigma: sigma.log().neg()
     last_x = None
+    sigmas = initial_sigmas.copy()
     for i in trange(len(sigmas) - 1, disable=disable):
         denoised = x if i == 0 else model(x, sigmas[i] * s_in, **extra_args)
         if callback is not None:
@@ -32,6 +33,12 @@ def sampler_dpmu(model, x, sigmas, extra_args=None, callback=None, disable=None)
         if sigmas[i + 1] == 0:
             return torch.lerp(denoised, last_x, 0.5) * dpmu_factor
         else:
+            if i < len(sigmas) - 2:
+                next_denoised = model(x, sigmas[i+1] * s_in, **extra_args)
+                mse = torch.mean((denoised - next_denoised)**2)
+                comp_noise_level = (mse / (2 * h)).clamp(max=1)
+                new_sigma = sigmas[i] * ((1 - comp_noise_level)**0.5)  #new noise level
+                sigmas[i+1] = new_sigma.clamp(min=0.001)  # add a minimum value
             h_last = t - t_fn(sigmas[i - 1])
             r = h_last / h
             x = (sigma_fn(t_next) / sigma_fn(t)) * x - (-h).expm1() * (1 + 1 / (2 * r)) * denoised / 2
