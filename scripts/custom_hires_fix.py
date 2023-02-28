@@ -43,7 +43,7 @@ class CustomHiresFix(scripts.Script):
         if not is_img2img:
             return scripts.AlwaysVisible
         else:
-            return False
+            return scripts.AlwaysVisible #False
 
     def ui(self, is_img2img):
         with gr.Accordion(label='Custom hires fix', open=False):
