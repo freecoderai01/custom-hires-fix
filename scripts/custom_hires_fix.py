@@ -66,7 +66,7 @@ class CustomHiresFix(scripts.Script):
                 dpmu_factor = gr.Slider(minimum=0.6, maximum=1.0, step=0.01, label="DPMU output factor (color correction)", value=0.85)
                 clamp_vae = gr.Slider(minimum=1.0, maximum=10.0, step=1.0, label="Clamp VAE input (NaN fix)", value=3.0)
             with gr.Row():
-                disable = gr.Checkbox(label='Disable extension', value=False)
+                disable = gr.Checkbox(label='Disable extension', value=True)
 
         return [first_upscaler, second_upscaler, first_cfg, second_cfg, first_denoise, second_denoise,
                 first_sampler, second_sampler, first_noise_scheduler, second_noise_scheduler, dpmu_factor, disable, clamp_vae]
